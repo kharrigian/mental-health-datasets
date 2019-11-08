@@ -25,7 +25,7 @@ for col in columns_to_format:
     df[col] = df[col].map(strip_space)
 
 ## Generate Markdown Table
-md_table = tabulate(df, tablefmt="pipe", headers="keys")
+md_table = tabulate(df, tablefmt="pipe", headers="keys", showindex="never")
 
 ## Output
 md_output = """
