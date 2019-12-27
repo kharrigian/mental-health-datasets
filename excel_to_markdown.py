@@ -24,13 +24,16 @@ for col in columns_to_format:
     df[col] = df[col].map(newline_replace)
     df[col] = df[col].map(strip_space)
 
+## Link in Title
+title_formatter = lambda row: "[{}]({})".format(row["Paper"], row["Reference Link"])
+df["Paper"] = df.apply(title_formatter, axis = 1)
+
 ## Subset Columns
 col_subset = ["Paper",
               "Authors",
               "Platform",
               "Year",
-              "Target Outcomes",
-              "Reference Link"]
+              "Target Outcomes"]
 df = df[col_subset].copy()
 
 ## Sort by Date
