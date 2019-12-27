@@ -24,6 +24,18 @@ for col in columns_to_format:
     df[col] = df[col].map(newline_replace)
     df[col] = df[col].map(strip_space)
 
+## Subset Columns
+col_subset = ["Paper",
+              "Authors",
+              "Platform",
+              "Year",
+              "Target Outcomes",
+              "Reference Link"]
+df = df[col_subset].copy()
+
+## Sort by Date
+df = df.sort_values("Year", ascending=False)
+
 ## Generate Markdown Table
 md_table = tabulate(df, tablefmt="pipe", headers="keys", showindex="never")
 
@@ -31,7 +43,7 @@ md_table = tabulate(df, tablefmt="pipe", headers="keys", showindex="never")
 md_output = """
 # Mental Health Datasets
 
-The information below is an evolving list of data sets (primarily from electronic/social media) that have been used to model mental-health phenomena. The raw data can be found in `data_sources.xlsx`. If you are an author of any of these papers and feel that anything is misrepresented, please do not hesitate to reach out to me at kharrigian@jhu.edu.
+The information below is an evolving list of data sets (primarily from electronic/social media) that have been used to model mental-health phenomena. The raw data (with additional columns) can be found in `data_sources.xlsx`. If you are an author of any of these papers and feel that anything is misrepresented, please do not hesitate to reach out to me at kharrigian@jhu.edu.
 
 **Last Update**: {}
 
