@@ -229,6 +229,12 @@ Notes:
 - Begin with 71 papers. Of the 71 papers, 58 contain original datasets. Of the papers
   that used an existing dataset, 6 used the CLPsych 2015 paper. 2 papers used the RSDD
   data set. All others were one-off runs.
+- We make no claims that this list is comprehensive. Indeed, the goal of this project
+  is to establish a single, evolving repository of literature and data that can be
+  used for researchers in this community. It will be housed Github (open for contribution)
+  and managed by the authors of this paper.
+- Papers span 2012 to 2019. Number of papers generally increasing over time (e.g. 1 in 
+  2012 and 16 in 2019, though this could be a facet of the initial search technique)
 - Note that "original" distinction might not be perfect. For example, the SMHD data set
   extends and cleans the RSDD dataset (there is a high overlap in users). For some of the
   Twitter datasets (especially those from Glen) which may use barely-modified regular 
