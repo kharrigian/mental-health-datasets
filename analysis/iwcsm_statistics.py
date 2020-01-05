@@ -456,17 +456,34 @@ latex_df = data_df[["title",
                     "year",
                     "platforms",
                     "tasks",
+                    "annotation_level",
+                    "n_individuals_total",
+                    "n_documents_total",
                     "availability"]].copy()
 latex_df["tasks"] = latex_df["tasks"].map(get_clean_task_name)
 latex_df["platforms"] = latex_df["platforms"].map(get_clean_platform_name)
 latex_df["availability"] = latex_df["availability"].map(get_clean_availability)
 latex_df["reference"] = latex_df.apply(get_clean_reference, axis = 1)
 latex_df["reference"] = latex_df["title"] + " " + latex_df["reference"]
+latex_df["annotation_level"] = latex_df["annotation_level"].str.title()
+latex_df["n_individuals_total"] = latex_df["n_individuals_total"].map(lambda i: "{:,d}".format(int(i)) if not pd.isnull(i) else "")
+latex_df["n_documents_total"] = latex_df["n_documents_total"].map(lambda i: "{:,d}".format(int(i)) if not pd.isnull(i) else "")
 
 ## Sort Rows, Columns
 latex_df.sort_values("year", ascending = True, inplace = True)
 latex_df = latex_df[["reference",
                      "platforms",
                      "tasks",
+                     "annotation_level",
+                     "n_individuals_total",
+                     "n_documents_total",
                      "availability"]]
 latex_df.reset_index(drop=True, inplace=True)
+latex_df.rename(columns = {"reference":"Reference",
+                           "platforms":"Platform(s)",
+                           "tasks":"Task(s)",
+                           "annotation_level":"Label Resolution",
+                           "n_individuals_total":"# Individuals",
+                           "n_documents_total":"# Documents",
+                           "availability":"Availability"},
+                inplace = True)
