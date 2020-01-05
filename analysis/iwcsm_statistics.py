@@ -434,6 +434,8 @@ individual_annot_inds = data_df.loc[(data_df.annotation_level=="individual")]["n
 """
 - Additional Filtering Criteria
     * Availability: Known and readily available
+- Note: By nature of how we conducted this review, this strictly disqualifies
+        non-English datasets from making it to the final filtered set.
 """
 
 ## Outline Filtering Criteria
