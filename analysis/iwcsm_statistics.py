@@ -17,6 +17,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from textwrap import wrap
 
 ###################
 ### Helper Functions
@@ -27,6 +28,9 @@ flatten = lambda l: [item for sublist in l for item in sublist]
 
 ## Union of Sets
 set_union = lambda s: sorted(list(set.union(*[i for i in s if isinstance(i, set)])))
+
+## Wrap Text
+wraptext = lambda t: "\n".join(wrap(t, 20))
 
 def format_float(num):
     """
@@ -149,6 +153,44 @@ def get_clean_task_name(tasks):
             task_names.append(t.replace("_"," ").title())
     task_names = ", ".join(task_names)
     return task_names
+
+def get_clean_task_abbr(clean_task_names):
+    """
+
+    """
+    ## Define Abbreviation Map
+    abbr_map = {
+        "Suicide (Ideation)":"SI",
+        "Suicide (Attempt)":"SA",
+        "Bipolar Personality Disorder":"BIPD",
+        "Borderline Personality Disorder":"BRPD",
+        "PTSD": "PTSD",
+        "Seasonal Affective Disorder": "SAD",
+        "Depression": "DEP",
+        "Anxiety": "ANX",
+        "Eating": "EAT",
+        "OCD": "OCD",
+        "Schizophrenia": "SCHZ",
+        "ADHD": "ADHD",
+        "Psychosis": "PSY",
+        "Anxiety (Social)": "ANXS",
+        "Self Harm": "SH",
+        "Rape (Survivors)": "RS",
+        "Panic": "PAN",
+        "Trauma": "TRA",
+        "Alcoholism": "ALC",
+        "Opiate Addiction": "OPAD",
+        "Aspergers": "ASP",
+        "Autism": "AUT",
+        "Opiate Usage": "OPUS",
+        "Mental Health Disorder (General)": "MHGEN",
+        "Stress": "STR",
+    }
+    ## Split and Replace
+    clean_task_names = clean_task_names.split(", ")
+    clean_task_names = [abbr_map[t] for t in clean_task_names]
+    return ", ".join(clean_task_names)
+
 
 def get_clean_platform_name(platforms):
     """
@@ -462,12 +504,12 @@ latex_df = data_df[["title",
                     "n_individuals_total",
                     "n_documents_total",
                     "availability"]].copy()
-latex_df["tasks"] = latex_df["tasks"].map(get_clean_task_name)
+latex_df["tasks"] = latex_df["tasks"].map(get_clean_task_name).map(get_clean_task_abbr)
 latex_df["platforms"] = latex_df["platforms"].map(get_clean_platform_name)
 latex_df["availability"] = latex_df["availability"].map(get_clean_availability)
 latex_df["reference"] = latex_df.apply(get_clean_reference, axis = 1)
 latex_df["reference"] = latex_df["title"] + " " + latex_df["reference"]
-latex_df["annotation_level"] = latex_df["annotation_level"].str.title()
+latex_df["annotation_level"] = latex_df["annotation_level"].str.title().map(lambda i: i[:3] + ".")
 latex_df["n_individuals_total"] = latex_df["n_individuals_total"].map(lambda i: "{:,d}".format(int(i)) if not pd.isnull(i) else "")
 latex_df["n_documents_total"] = latex_df["n_documents_total"].map(lambda i: "{:,d}".format(int(i)) if not pd.isnull(i) else "")
 
