@@ -17,7 +17,6 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from textwrap import wrap
 
 ###################
 ### Helper Functions
@@ -28,9 +27,6 @@ flatten = lambda l: [item for sublist in l for item in sublist]
 
 ## Union of Sets
 set_union = lambda s: sorted(list(set.union(*[i for i in s if isinstance(i, set)])))
-
-## Wrap Text
-wraptext = lambda t: "\n".join(wrap(t, 20))
 
 def format_float(num):
     """
