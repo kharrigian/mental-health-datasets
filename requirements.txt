@@ -1,2 +1,5 @@
 tabulate
 pandas
+numpy
+matplotlib
+xlrd
