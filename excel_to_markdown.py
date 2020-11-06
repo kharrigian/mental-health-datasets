@@ -38,6 +38,7 @@ df = df[col_subset].copy()
 
 ## Sort by Date
 df = df.sort_values("Year", ascending=False)
+df = df.reset_index(drop=True)
 
 ## Generate Markdown Table
 md_table = tabulate(df, tablefmt="pipe", headers="keys", showindex="never")
