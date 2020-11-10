@@ -404,7 +404,7 @@ Notes:
       researchers can properly respect privacy constraints (given the prevalence of these
       platforms in society)
 - Language
-    * 4 unique languages
+    * 6 unique languages
     * Of the 102 papers, 85 primarily use English text
     * Chinese (10), Japanese (4), Korean (2), Spanish (1), and Portuguese (1) round out the remaining list
     * Chinese datasets use Sina/Tencent Weibo and Youtube. Japanese uses Twitter, 
