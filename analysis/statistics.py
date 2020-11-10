@@ -158,13 +158,14 @@ def get_clean_task_abbr(clean_task_names):
     abbr_map = {
         "Suicide (Ideation)":"SI",
         "Suicide (Attempt)":"SA",
-        "Bipolar Personality Disorder":"BIPD",
+        "Bipolar Disorder":"BIPD",
         "Borderline Personality Disorder":"BRPD",
         "PTSD": "PTSD",
         "Seasonal Affective Disorder": "SAD",
         "Depression": "DEP",
         "Anxiety": "ANX",
         "Eating": "EAT",
+        "Eating (Recovery)":"EATR",
         "OCD": "OCD",
         "Schizophrenia": "SCHZ",
         "ADHD": "ADHD",
@@ -181,6 +182,7 @@ def get_clean_task_abbr(clean_task_names):
         "Opiate Usage": "OPUS",
         "Mental Health Disorder (General)": "MHGEN",
         "Stress": "STR",
+        "Stress (Stressor And Subjects)":"STRS"
     }
     ## Split and Replace
     clean_task_names = clean_task_names.split(", ")
@@ -309,15 +311,19 @@ data_df["contains_original_source"] = data_df.apply(original_source_check, axis=
 ## Process Primary Language
 data_df["primary_language"] = data_df["primary_language"].str.title()
 
+## Year Filter 
+data_df = data_df.loc[data_df["year"] < 2020].reset_index(drop=True).copy()
+
 ###################
 ### Initial Filtering
 ###################
 
 """
 Notes:
-- Begin with 71 papers. Of the 71 papers, 58 contain original datasets. Of the papers
-  that used an existing dataset, 6 used the CLPsych 2015 paper. 2 papers used the RSDD
-  data set. All others were one-off duplicates.
+- Begin with 139 papers. Of the 139 papers, 111 contain original datasets. Of the papers
+  that used an existing dataset, 7 used the CLPsych 2015 paper. 3 papers used the RSDD
+  data set. 3 used Gktosis et al. ("Language of mental health"), 2 used CLPsych 2016, and the 
+  rest of duplicates were one off uses.
 - We make no claims that this list is comprehensive. Indeed, the goal of this project
   is to establish a single, evolving repository of literature and data that can be
   used for researchers in this community. It will be housed Github (open for contribution)
@@ -330,37 +336,54 @@ Notes:
   expressions to annotate individuals, there may also be some overlap between the group
   annotated as suffering from a mental health disorder.
 - Initial Filtering Criteria
-    * Electronic Multimedia Only (e.g. No EHR, Clinical Notes, Last Statements)
+    * Electronic Multimedia Only w/ Text Focus (e.g. Includes SMS, Social Media, Forums, Web Search;
+      Excludes EHR, Clinical Notes, Last Statements, Mobile Health Apps)
     * Mental Health Status Only (e.g. No Billing Codes, No Diagnoses Date Detection, No Cyberbullying)
-    * Ignore Datasets that lack annotation (e.g. IR, platform data dump with demographics)
-    * Ignore Tasks framed more closely as sentiment analysis
+    * Ignore Datasets that lack any type of annotation (e.g. IR, platform data dump with demographics)
+    * Ignore tasks that don't attempt to adhere to DSM definition of mental health condition (e.g. 
+      no sentiment/mood tasks)
     * Unique datasets only (e.g. original)
 """
 
-## Isolate Unique Datasets
-data_df =  data_df.loc[data_df["contains_original_source"]]
+## Initialize Counts for Filters
+filter_counts = dict()
 
-## Filter Out Tasks that lack annotation
+## Isolate Unique Datasets (139 -> 111)
+filter_counts["initial_search"] = len(data_df)
+data_df =  data_df.loc[data_df["contains_original_source"]]
+filter_counts["unique_datasets_only"] = len(data_df)
+
+## Filter Out Tasks that lack annotation (111 -> 108)
 data_df = data_df.loc[~data_df.tasks.isnull()]
 data_df = data_df.loc[data_df.tasks != "N/A"]
 
-## Platforms to Ignore
+## Platforms to Ignore (108 -> 108: Search-based Filter)
 filter_platforms = set(["ehr",
                         "death_row_last_statements",
                         "doctor_patient_conversation",
                         "interview",
-                        "phone"])
+                        "phone",
+                        'ecological_momentary_assessments',
+                        "essays"])
 data_df = data_df.loc[~data_df["platforms"].map(lambda i: all(p in filter_platforms for p in i))]
+data_df["platforms"] = data_df["platforms"].map(lambda i: set(j for j in i if j not in filter_platforms))
 
-## Tasks to Ignore
+## Tasks to Ignore (108 -> 102)
 filter_tasks = set(["counseling_outcome",
                     "cyberbullying",
                     "imminent_death",
                     "depression_(diagnoses_date)",
                     "psychiatric_(concepts)",
                     "psychiatric_(readmission)",
-                    "sentiment"])
+                    "sentiment",
+                    "aggression",
+                    "breast_cancer",
+                    "ehr_categories",
+                    "life_satisfaction",
+                    "relationships"])
 data_df = data_df.loc[~data_df["tasks"].map(lambda i: all(p in filter_tasks for p in i))]
+data_df["tasks"] = data_df["tasks"].map(lambda i: set(j for j in i if j not in filter_tasks))
+filter_counts["apply_exclusion_criteria"] = len(data_df)
 
 ###################
 ### Preliminary Analysis
@@ -369,17 +392,17 @@ data_df = data_df.loc[~data_df["tasks"].map(lambda i: all(p in filter_tasks for 
 """
 Notes:
 - Size/Timespan:
-    * Filtering described above leaves us with 44 papers from 2012 to 2019.
-    * Average of 5.5 datasets released each year, with the majority
-      being released after 2014. Min is 1 (2012). Max is 8 (2018).
+    * Filtering described above leaves us with 102 papers from 2012 to 2019.
+    * Average of 12.75 datasets released each year, with the majority
+      being released after 2012. Min is 1 (2012). Max is 23 (2017).
 - Task
-    * 28 types of mental health-related modeling tasks (majority only occurring 1 or 2 times)
-    * Majority of research focuses on Depression (19) and Suicidal Ideation (17)
-    * PTSD, Bipolar Personality Disorder, Self Harm, and Eating Disorders all
+    * 36 types of mental health-related modeling tasks (majority only occurring 1 or 2 times)
+    * Majority of research focuses on Depression (42) and Suicidal Ideation (26), and Eating (11)
+    * PTSD, Self Harm, Anxiety, Schizophrenia, Bipolar Disorder, Stress also
       have more than 4 unique data sets
 - Platform
-    * 12 unique electronic media platforms/types (e.g. web search is general)
-    * Majority of research uses Twitter (19) and Reddit (12)
+    * 20 unique electronic media platforms/types (e.g. web search is general)
+    * Majority of research uses Twitter (47) and Reddit (22)
     * Surprisingly limited Youtube, Instagram, Facebook research. Facebook/Instagram likely
       due to privacy constraints. Dearth of Instagram may also be due to our paper sourcing
       process that focused primarily on availability of text data. Dearth of Youtube is also
@@ -387,54 +410,54 @@ Notes:
       researchers can properly respect privacy constraints (given the prevalence of these
       platforms in society)
 - Language
-    * 4 unique languages
-    * Of the 44 papers, 38 primarily use English text
-    * Chinese (4), Korean (1), and Japanese (1) round out the remaining list
-    * Chinese datasets use Sina Weibo and Youtube. Japanese uses Twitter. Korean
-      uses Facebook.
+    * 6 unique languages
+    * Of the 102 papers, 85 primarily use English text
+    * Chinese (10), Japanese (4), Korean (2), Spanish (1), and Portuguese (1) round out the remaining list
+    * Chinese datasets use Sina/Tencent Weibo and Youtube. Japanese uses Twitter, 
+      Mixi, and Tobyo Toshoshitshu. Korean uses uses Twitter and Facebook.
     * Given that some research has shown cultural differences lead to different
       presentations of mental health disorders, there would be large value in
-      new datasets that explore a wider variety of languages or populations.
+      new datasets that explore a wider variety of languages or populations. 
+    * Several papers commonly mention filtering to English data (inferred via i.e. Langid)
 - Annotation Elements
-    * 14 unique types of annotation mechanisms identified (not necessarily disjoint)
-    * Regular expressions (or keyword matches) were used in 18 of the papers,
-      with manual annotation used in 14. Of the 18 papers that used regular expressions,
-      9 also used some form of manual annotation on a sample of the data to verify
+    * 24 unique types of annotation mechanisms identified (not necessarily disjoint)
+    * Regular expressions (or keyword matches) were used in 43 of the papers,
+      with manual annotation used in 38. Of the 43 papers that used regular expressions,
+      23 also used some form of manual annotation on a sample (possibly all) of the data to verify
       the correctness of the labeling schema.
-    * Clinically-based surveys (9), community participation (7), and platform activity (3)
-      were also regularly used to annotate users
-    * Majority of papers annotated on an individual level (29), as opposed to document (15)
+    * Clinically-based surveys (22), community participation/affiliation-based (24), hashtags (5),
+      tags (4), interviews (4) and and platform activity (3) were also regularly used to annotate users
+    * Majority of papers annotated on an individual level (63), as opposed to document (40) [note
+    that one dataset was labeled at both a document and individual level]
 - Dataset Availability
     * 8 availability classes
-    * 17 of the papers had unknown availability
-    * 5 Data sets were known not to be available for distribution
-    * 21 of the papers had known availability. Majority of available papers (10)
-      require a signed agreement. Reproducible with API (8), available from
-      author with permission (2), and available without restriction (1) rounded 
-      out the list.
-    * Of the 9 papers that used clinical annotation (e.g. mental health test,
-      medical history), 2 had known availability (both prohibited) and the rest
+    * 54 of the papers had unknown availability (e.g. not readily distinguishable from paper)
+    * 12 Data sets were known not to be available for distribution
+    * 35 of the papers had known availability. Majority (18) reproducible with API and some 
+      manual effort. (12) available without modification with a signed agreement,
+      (2) available from author with permission, and (3) available without restriction.
+    * Of the 22 papers that used clinical annotation (e.g. mental health test,
+      medical history), 8 had known availability (7 prohibited, 1 no longer exists) and the rest
       were unknown. Anecdotally, we noticed that datasets that weren't reproducible
       via an API (community membership, regex) and had some form of manual annotation
-      were often not able to be distributed to the terms of the collection.
-            - Note: 4 of the datasets with unknown were non-English, so we didn't check.
-            - Note: 2 of the datasets were non depression/suicidal ideation related, so we also 
-                    didn't check availability.
-    * 1 dataset had pending availability
+      were often not able to be distributed to the terms of the collection (e.g. IRB/HIPAA)
+            - Note: We did not check with authors regarding any non-English datasets.
+    * 1 dataset had pending availability (authors still doing primary research with it)
 - Dataset Size
     * Document-Level Annotation
-        - 3/15 have unknown amounts of documents, 8/15 have unknown amounts of individuals
-        - Individuals: Min (33), Max (950000), Mean (225764.1), Median (5051.0), Std (387185.7)
-        - Documents:  Min (129), Max (117200000), Mean (9879502.6), Median (6114.5), Std (33797924.4)
+        - 3/40 have unknown amounts of documents, 28/40 have unknown amounts of individuals
+        - Individuals: Min (33), Max (950000), Mean (144350.18), Median (1227), Std (320485)
+        - Documents:  Min (129), Max (117200000), Mean (3407890), Median (6516), Std (19512189)
     * Individual-Level Annotation
-        - 21/29 have unknown amounts of documents, 1/29 has unknown amounts of individuals
-        - Individuals: Min (52), Max (116210), Mean (18136.9), Median (1372.5), Std (34849.8)
-        - Documents:  Min (5706), Max (26000000), Mean (6218388.25), Median (315650.0), Std (9899705.9)
-    * Primarily left-skewed. One concern is that the median number of unique individuals is relatively low.
-      Small sample size means that the data sets are not representative of the greater population.
-    * As expected, the largest datasets primarily use regular expressions or platform activity (e.g. distant supervision)
-      to create the full sample. That said, they do make sure to use manual annotation on a subset of the data
-      to validate the labeling strategy
+        - 40/63 have unknown amounts of documents, 1/63 has unknown amounts of individuals
+        - Individuals: Min (14), Max (300038395), Mean (4934830), Median (909), Std (38413897)
+        - Documents:  Min (1856), Max (10035292000), Mean (463926900), Median (462447), Std (2137855934)
+    * Primarily left-skewed. One concern is that the median number of unique individuals is relatively low. 
+    Small sample size means that the data sets are not likely representative of the greater population.
+    * As expected, the largest datasets primarily use regular expressions or platform activity 
+    (e.g. distant supervision) to create the full sample. That said, they do make sure 
+    to use manual annotation on a subset of the data to validate the labeling strategy. Noise is 
+    not necessarily considered during the evaluation procedures, however.
 """
 
 ## Get Filtered Platforms, Tasks
@@ -484,7 +507,12 @@ acceptable_availability = set([
             "Available (No Restrictions)"])
 
 ## Apply Additional Filtering Criteria
+filter_counts["known_availability"] = (data_df["availability"] != "Unknown").sum()
 data_df = data_df.loc[data_df["availability"].map(lambda i: i in acceptable_availability)]
+filter_counts["available"] = len(data_df)
+
+## Format Filter Counts
+filter_counts = pd.Series(filter_counts)
 
 ###################
 ### Figures (Tables)
@@ -500,7 +528,7 @@ latex_df = data_df[["title",
                     "n_individuals_total",
                     "n_documents_total",
                     "availability"]].copy()
-latex_df["tasks"] = latex_df["tasks"].map(get_clean_task_name).map(get_clean_task_abbr)
+latex_df["tasks"] = latex_df["tasks"].map(lambda x: set(i for i in x if i not in filter_tasks)).map(get_clean_task_name).map(get_clean_task_abbr)
 latex_df["platforms"] = latex_df["platforms"].map(get_clean_platform_name)
 latex_df["availability"] = latex_df["availability"].map(get_clean_availability)
 latex_df["reference"] = latex_df.apply(get_clean_reference, axis = 1)
@@ -517,7 +545,7 @@ latex_df = latex_df[["reference",
                      "annotation_level",
                      "n_individuals_total",
                      "n_documents_total",
-                     "availability"]]
+                     "availability"]].copy()
 latex_df.reset_index(drop=True, inplace=True)
 latex_df.rename(columns = {"reference":"Reference",
                            "platforms":"Platform(s)",
@@ -527,3 +555,31 @@ latex_df.rename(columns = {"reference":"Reference",
                            "n_documents_total":"# Documents",
                            "availability":"Availability"},
                 inplace = True)
+
+###################
+### Figures (Plots)
+###################
+
+## Search
+fig, ax = plt.subplots(figsize=(8,6))
+ax.bar(range(filter_counts.shape[0]),
+       filter_counts.values,
+       color="navy",
+       alpha=0.7,
+       edgecolor="navy")
+for i, c in enumerate(filter_counts.values):
+    ax.text(i, c + 1, int(c), fontsize=18, ha="center", va="bottom")
+ax.set_xticks(range(filter_counts.shape[0]))
+ax.set_xticklabels([i.replace("_","\n").title() for i in filter_counts.index],
+                    rotation=45,
+                    ha="center")
+ax.set_ylabel("# Articles", fontweight="bold", fontsize=28)
+ax.set_xlabel("Filtering Stage", fontweight="bold", fontsize=28)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.tick_params(labelsize=18)
+ax.set_ylim(0,filter_counts.max()+8)
+fig.tight_layout()
+fig.savefig("./supplemental_data/search.pdf", dpi=300)
+plt.close(fig)
+
