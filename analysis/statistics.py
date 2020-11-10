@@ -345,8 +345,13 @@ Notes:
     * Unique datasets only (e.g. original)
 """
 
+## Initialize Counts for Filters
+filter_counts = dict()
+
 ## Isolate Unique Datasets (139 -> 111)
+filter_counts["initial_search"] = len(data_df)
 data_df =  data_df.loc[data_df["contains_original_source"]]
+filter_counts["unique_datasets_only"] = len(data_df)
 
 ## Filter Out Tasks that lack annotation (111 -> 108)
 data_df = data_df.loc[~data_df.tasks.isnull()]
@@ -378,6 +383,7 @@ filter_tasks = set(["counseling_outcome",
                     "relationships"])
 data_df = data_df.loc[~data_df["tasks"].map(lambda i: all(p in filter_tasks for p in i))]
 data_df["tasks"] = data_df["tasks"].map(lambda i: set(j for j in i if j not in filter_tasks))
+filter_counts["apply_exclusion_criteria"] = len(data_df)
 
 ###################
 ### Preliminary Analysis
@@ -501,7 +507,12 @@ acceptable_availability = set([
             "Available (No Restrictions)"])
 
 ## Apply Additional Filtering Criteria
+filter_counts["known_availability"] = (data_df["availability"] != "Unknown").sum()
 data_df = data_df.loc[data_df["availability"].map(lambda i: i in acceptable_availability)]
+filter_counts["available"] = len(data_df)
+
+## Format Filter Counts
+filter_counts = pd.Series(filter_counts)
 
 ###################
 ### Figures (Tables)
@@ -544,3 +555,31 @@ latex_df.rename(columns = {"reference":"Reference",
                            "n_documents_total":"# Documents",
                            "availability":"Availability"},
                 inplace = True)
+
+###################
+### Figures (Plots)
+###################
+
+## Search
+fig, ax = plt.subplots(figsize=(8,6))
+ax.bar(range(filter_counts.shape[0]),
+       filter_counts.values,
+       color="navy",
+       alpha=0.7,
+       edgecolor="navy")
+for i, c in enumerate(filter_counts.values):
+    ax.text(i, c + 1, int(c), fontsize=18, ha="center", va="bottom")
+ax.set_xticks(range(filter_counts.shape[0]))
+ax.set_xticklabels([i.replace("_","\n").title() for i in filter_counts.index],
+                    rotation=45,
+                    ha="center")
+ax.set_ylabel("# Articles", fontweight="bold", fontsize=28)
+ax.set_xlabel("Filtering Stage", fontweight="bold", fontsize=28)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.tick_params(labelsize=18)
+ax.set_ylim(0,filter_counts.max()+8)
+fig.tight_layout()
+fig.savefig("./supplemental_data/search.pdf", dpi=300)
+plt.close(fig)
+
