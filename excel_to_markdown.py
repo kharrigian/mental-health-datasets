@@ -49,6 +49,17 @@ md_output = """
 
 The information below is an evolving list of data sets (primarily from electronic/social media) that have been used to model mental-health phenomena. The raw data (with additional columns) can be found in `data_sources.xlsx`. If you are an author of any of these papers and feel that anything is misrepresented, please do not hesitate to reach out to me at kharrigian@jhu.edu.
 
+For an overview of existing datasets, please consider reading our paper [*On the State of Social Media Data for Mental Health Research*](https://arxiv.org/abs/2011.05233).
+
+```
+@article{harrigian2020state,
+  title={On the State of Social Media Data for Mental Health Research},
+  author={Harrigian, Keith and Aguirre, Carlos and Dredze, Mark},
+  journal={arXiv preprint arXiv:2011.05233},
+  year={2020}
+}
+```
+"""+"""
 **Last Update**: {}
 
 {}
