@@ -6,15 +6,15 @@ The information below is an evolving list of data sets (primarily from electroni
 For an overview of existing datasets, please consider reading our paper [*On the State of Social Media Data for Mental Health Research*](https://arxiv.org/abs/2011.05233).
 
 ```
-@article{harrigian2020state,
+@inproceedings{harrigian2020state,
   title={On the State of Social Media Data for Mental Health Research},
   author={Harrigian, Keith and Aguirre, Carlos and Dredze, Mark},
-  journal={arXiv preprint arXiv:2011.05233},
-  year={2020}
+  booktitle={Proceedings of the 7th Workshop on Computational Linguistics and Clinical Psychology: Improving Access},
+  year={2021}
 }
 ```
 
-**Last Update**: 2020-12-09T12:45:13.663521
+**Last Update**: 2021-04-24T12:59:40.492596
 
 | Paper                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Authors                                                                                                | Platform                                                                                            |   Year | Target Outcomes                                                                                                                                                                      |
 |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------|-------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
