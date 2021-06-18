@@ -12,9 +12,17 @@ For an overview of existing datasets, please consider reading our paper [*On the
   booktitle={Proceedings of the 7th Workshop on Computational Linguistics and Clinical Psychology: Improving Access},
   year={2021}
 }
+
+## Contributing
+
+We hope this repository becomes the central knowledge base for researchers working at the intersection of NLP and mental health. However, we cannot achieve this goal without the support of the community.
+
+You can view our backlog of literature that needs annotation [here](https://docs.google.com/spreadsheets/d/1KI-LlcTw5YCS0iuPEkCUD29z0XdZnqw91iWxyY8Y-jw/edit?usp=sharing). To annotate one of these papers, or to annotate a paper we haven't yet identified, please begin by updating the backlog to note that you are taking responsibility for a paper's annotation. After, you can use our [standardized annotation form](https://docs.google.com/forms/d/e/1FAIpQLSfgN5pPivsNvWBsO3YZBx8H91nrBHTd0bWI2Ao1X9KPhlUWsQ/viewform?usp=sf_link) to make a submission that will be reviewed and published within the main directory.
+
+## Dataset Directory
 ```
 
-**Last Update**: 2021-06-18T11:39:34.646648
+**Last Update**: 2021-06-18T16:34:04.481431
 
 | Paper                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Authors                                                                                                | Platform                                                                                            |   Year | Target Outcomes                                                                                                                                                                      |
 |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------|-------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
